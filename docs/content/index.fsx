@@ -1,7 +1,7 @@
 (*** hide ***)
 // This block of code is omitted in the generated HTML documentation. Use 
 // it to define helpers that you do not want to show in the documentation.
-#I "../../bin"
+#I "../../bin/NPOI.FSharp"
 
 (**
 NPOI.FSharp
@@ -23,13 +23,58 @@ Documentation
 Example
 -------
 
-This example demonstrates using a function defined in this sample library.
+This example demonstrates using the library to convert an exel spreadsheet to CSV.
 
 *)
-#r "NPOI.FSharp.dll"
-open NPOI.FSharp
+#r "NPOI"
+#r "NPOI.OOXML"
+#r "NPOI.FSharp"
 
-printfn "hello = %i" <| Library.hello 0
+open NPOI.FSharp
+open System.Globalization
+
+let rec formatCellValueForCsv = function
+  | CellValue.Number n -> n.ToString(CultureInfo.InvariantCulture)
+  | CellValue.String s -> sprintf "\"%s\"" (s.Replace("\"","\"\""))
+  | CellValue.Formula(formula, cachedResult) ->
+    match cachedResult with
+    | CellValue.Error _
+    | CellValue.Unknown _
+    | CellValue.Formula _ -> formula
+    | _ -> formatCellValueForCsv cachedResult
+  | CellValue.Blank -> ""
+  | CellValue.Boolean b -> b.ToString(CultureInfo.InvariantCulture)
+  | CellValue.Error e -> sprintf "Error: %i" e
+  | CellValue.Unknown t -> "Error: Unknown cell type"
+
+let formatCellForCsv cell =
+  cell |> Cell.value |> formatCellValueForCsv
+
+let formatRowForCsv row =
+  row
+  |> Row.cells
+  |> Seq.map formatCellForCsv
+  |> String.concat ","
+
+let toCsv workbook =
+  workbook
+  |> Workbook.activeSheet
+  |> Sheet.rows
+  |> Seq.map formatRowForCsv
+  |> String.concat "\n"
+
+let xlsxToCsv filePath =
+  filePath
+  |> System.IO.File.ReadAllBytes
+  |> Workbook.fromXslxBytes
+  |> toCsv
+
+let xlsToCsv filePath =
+  filePath
+  |> System.IO.File.ReadAllBytes
+  |> Workbook.fromXlsBytes
+  |> toCsv
+
 
 (**
 Some more info
