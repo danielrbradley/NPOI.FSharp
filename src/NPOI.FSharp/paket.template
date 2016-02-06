@@ -1,0 +1,23 @@
+type project
+owners
+    Daniel Bradley
+authors 
+    Daniel Bradley
+projectUrl
+    http://github.com/danielrbradley/NPOI.FSharp
+iconUrl
+    https://raw.githubusercontent.com/danielrbradley/NPOI.FSharp/master/docs/files/img/logo.png
+licenseUrl
+    http://github.com/danielrbradley/NPOI.FSharp/blob/master/LICENSE.txt
+requireLicenseAcceptance
+    false
+copyright
+    Copyright 2015
+tags
+    NPOI Excel F# FSharp
+summary
+    F# wrappers for NPOI
+description
+    F# friendly wrappers for the NPOI library.
+
+
