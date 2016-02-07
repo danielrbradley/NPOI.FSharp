@@ -23,7 +23,9 @@ Documentation
 Example
 -------
 
-This example demonstrates using the library to convert an exel spreadsheet to CSV.
+This (bad) example demonstrates using the library to convert an exel spreadsheet to CSV.
+
+... don't use this - it has bugs - it's only an example of what the API looks like ;)
 
 *)
 #r "NPOI"
@@ -36,12 +38,7 @@ open System.Globalization
 let rec formatCellValueForCsv = function
   | CellValue.Number n -> n.ToString(CultureInfo.InvariantCulture)
   | CellValue.String s -> sprintf "\"%s\"" (s.Replace("\"","\"\""))
-  | CellValue.Formula(formula, cachedResult) ->
-    match cachedResult with
-    | CellValue.Error _
-    | CellValue.Unknown _
-    | CellValue.Formula _ -> formula
-    | _ -> formatCellValueForCsv cachedResult
+  | CellValue.Formula(formula, cachedResult) -> formula
   | CellValue.Blank -> ""
   | CellValue.Boolean b -> b.ToString(CultureInfo.InvariantCulture)
   | CellValue.Error e -> sprintf "Error: %i" e
@@ -52,21 +49,21 @@ let formatCellForCsv cell =
 
 let formatRowForCsv row =
   row
-  |> Row.cells
+  |> Row.cellsWithContent
   |> Seq.map formatCellForCsv
   |> String.concat ","
 
 let toCsv workbook =
   workbook
   |> Workbook.activeSheet
-  |> Sheet.rows
+  |> Sheet.rowsWithContent
   |> Seq.map formatRowForCsv
   |> String.concat "\n"
 
 let xlsxToCsv filePath =
   filePath
   |> System.IO.File.ReadAllBytes
-  |> Workbook.fromXslxBytes
+  |> Workbook.fromXlsxBytes
   |> toCsv
 
 let xlsToCsv filePath =
@@ -74,7 +71,6 @@ let xlsToCsv filePath =
   |> System.IO.File.ReadAllBytes
   |> Workbook.fromXlsBytes
   |> toCsv
-
 
 (**
 Some more info

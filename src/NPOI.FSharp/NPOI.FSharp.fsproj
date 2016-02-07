@@ -44,9 +44,9 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="paket.references" />
     <Compile Include="NPOI.FSharp.fs" />
     <None Include="NPOI.FSharp.fsx" />
-    <None Include="paket.references" />
     <None Include="paket.template" />
     <None Include="Scripts\load-references-debug.fsx" />
     <None Include="Scripts\load-project-debug.fsx" />

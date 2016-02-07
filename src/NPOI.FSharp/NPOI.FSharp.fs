@@ -13,7 +13,7 @@ module Workbook =
   let readXls (stream : Stream) =
     new HSSFWorkbook(stream)
 
-  let fromXslxBytes (bytes : byte[]) =
+  let fromXlsxBytes (bytes : byte[]) =
     new XSSFWorkbook(new MemoryStream(bytes))
 
   let fromXlsBytes (bytes : byte[]) =
@@ -22,26 +22,40 @@ module Workbook =
   let activeSheet (workbook : IWorkbook) =
     workbook.GetSheetAt workbook.ActiveSheetIndex
 
-  let sheetAt (workbook : IWorkbook) (sheetIndex : int) =
+  let sheetAt (sheetIndex : int) (workbook : IWorkbook) =
     workbook.GetSheetAt sheetIndex
 
-  let sheetNamed (workbook : IWorkbook) (sheetName : string) =
+  let sheetNamed (sheetName : string) (workbook : IWorkbook) =
     sheetName
     |> workbook.GetSheetIndex
     |> workbook.GetSheetAt
 
 module Sheet =
 
-  let rows (sheet : ISheet) =
+  let rowsWithContent (sheet : ISheet) =
     seq {
       let enumerator = sheet.GetRowEnumerator()
       while enumerator.MoveNext() do
         yield enumerator.Current :?> IRow
     }
 
+  let row (rowIndex : int)  (sheet : ISheet) =
+    match sheet.GetRow(rowIndex) with
+    | null -> sheet.CreateRow(rowIndex)
+    | row -> row
+
+  let cell (rowIndex : int, columnIndex : int) (sheet : ISheet) =
+    match sheet.GetRow(rowIndex) with
+    | null ->
+      sheet.CreateRow(rowIndex).CreateCell(columnIndex)
+    | row ->
+      match row.GetCell(columnIndex) with
+      | null -> row.CreateCell(columnIndex)
+      | cell -> cell
+
 module Row =
 
-  let cells (row : IRow) =
+  let cellsWithContent (row : IRow) =
     row.Cells
 
 [<RequireQualifiedAccess>]
