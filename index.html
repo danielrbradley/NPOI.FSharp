@@ -46,7 +46,8 @@
   <div class="span1"></div>
 </div>
 <h2><a name="Example" class="anchor" href="#Example">Example</a></h2>
-<p>This example demonstrates using the library to convert an exel spreadsheet to CSV.</p>
+<p>This (bad) example demonstrates using the library to convert an exel spreadsheet to CSV.</p>
+<p>... don't use this - it has bugs - it's only an example of what the API looks like ;)</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
 <span class="l"> 2: </span>
 <span class="l"> 3: </span>
@@ -90,11 +91,6 @@
 <span class="l">41: </span>
 <span class="l">42: </span>
 <span class="l">43: </span>
-<span class="l">44: </span>
-<span class="l">45: </span>
-<span class="l">46: </span>
-<span class="l">47: </span>
-<span class="l">48: </span>
 </pre></td>
 <td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="prep">#r</span> <span class="s">&quot;NPOI&quot;</span>
 <span class="prep">#r</span> <span class="s">&quot;NPOI.OOXML&quot;</span>
@@ -106,12 +102,7 @@
 <span class="k">let</span> <span class="k">rec</span> <span class="i">formatCellValueForCsv</span> <span class="o">=</span> <span class="k">function</span>
   | <span class="i">CellValue</span><span class="o">.</span><span class="i">Number</span> <span class="i">n</span> <span class="k">-&gt;</span> <span class="i">n</span><span class="o">.</span><span class="i">ToString</span>(<span class="i">CultureInfo</span><span class="o">.</span><span class="i">InvariantCulture</span>)
   | <span class="i">CellValue</span><span class="o">.</span><span class="i">String</span> <span class="i">s</span> <span class="k">-&gt;</span> <span class="i">sprintf</span> <span class="s">&quot;\&quot;%s\&quot;&quot;</span> (<span class="i">s</span><span class="o">.</span><span class="i">Replace</span>(<span class="s">&quot;\&quot;&quot;</span>,<span class="s">&quot;\&quot;\&quot;&quot;</span>))
-  | <span class="i">CellValue</span><span class="o">.</span><span class="i">Formula</span>(<span class="i">formula</span>, <span class="i">cachedResult</span>) <span class="k">-&gt;</span>
-    <span class="k">match</span> <span class="i">cachedResult</span> <span class="k">with</span>
-    | <span class="i">CellValue</span><span class="o">.</span><span class="i">Error</span> _
-    | <span class="i">CellValue</span><span class="o">.</span><span class="i">Unknown</span> _
-    | <span class="i">CellValue</span><span class="o">.</span><span class="i">Formula</span> _ <span class="k">-&gt;</span> <span class="i">formula</span>
-    | _ <span class="k">-&gt;</span> <span class="i">formatCellValueForCsv</span> <span class="i">cachedResult</span>
+  | <span class="i">CellValue</span><span class="o">.</span><span class="i">Formula</span>(<span class="i">formula</span>, <span class="i">cachedResult</span>) <span class="k">-&gt;</span> <span class="i">formula</span>
   | <span class="i">CellValue</span><span class="o">.</span><span class="i">Blank</span> <span class="k">-&gt;</span> <span class="s">&quot;&quot;</span>
   | <span class="i">CellValue</span><span class="o">.</span><span class="i">Boolean</span> <span class="i">b</span> <span class="k">-&gt;</span> <span class="i">b</span><span class="o">.</span><span class="i">ToString</span>(<span class="i">CultureInfo</span><span class="o">.</span><span class="i">InvariantCulture</span>)
   | <span class="i">CellValue</span><span class="o">.</span><span class="i">Error</span> <span class="i">e</span> <span class="k">-&gt;</span> <span class="i">sprintf</span> <span class="s">&quot;Error: %i&quot;</span> <span class="i">e</span>
@@ -122,21 +113,21 @@
 
 <span class="k">let</span> <span class="i">formatRowForCsv</span> <span class="i">row</span> <span class="o">=</span>
   <span class="i">row</span>
-  <span class="o">|&gt;</span> <span class="i">Row</span><span class="o">.</span><span class="i">cells</span>
+  <span class="o">|&gt;</span> <span class="i">Row</span><span class="o">.</span><span class="i">cellsWithContent</span>
   <span class="o">|&gt;</span> <span class="i">Seq</span><span class="o">.</span><span class="i">map</span> <span class="i">formatCellForCsv</span>
   <span class="o">|&gt;</span> <span class="i">String</span><span class="o">.</span><span class="i">concat</span> <span class="s">&quot;,&quot;</span>
 
 <span class="k">let</span> <span class="i">toCsv</span> <span class="i">workbook</span> <span class="o">=</span>
   <span class="i">workbook</span>
   <span class="o">|&gt;</span> <span class="i">Workbook</span><span class="o">.</span><span class="i">activeSheet</span>
-  <span class="o">|&gt;</span> <span class="i">Sheet</span><span class="o">.</span><span class="i">rows</span>
+  <span class="o">|&gt;</span> <span class="i">Sheet</span><span class="o">.</span><span class="i">rowsWithContent</span>
   <span class="o">|&gt;</span> <span class="i">Seq</span><span class="o">.</span><span class="i">map</span> <span class="i">formatRowForCsv</span>
   <span class="o">|&gt;</span> <span class="i">String</span><span class="o">.</span><span class="i">concat</span> <span class="s">&quot;\n&quot;</span>
 
 <span class="k">let</span> <span class="i">xlsxToCsv</span> <span class="i">filePath</span> <span class="o">=</span>
   <span class="i">filePath</span>
   <span class="o">|&gt;</span> <span class="i">System</span><span class="o">.</span><span class="i">IO</span><span class="o">.</span><span class="i">File</span><span class="o">.</span><span class="i">ReadAllBytes</span>
-  <span class="o">|&gt;</span> <span class="i">Workbook</span><span class="o">.</span><span class="i">fromXslxBytes</span>
+  <span class="o">|&gt;</span> <span class="i">Workbook</span><span class="o">.</span><span class="i">fromXlsxBytes</span>
   <span class="o">|&gt;</span> <span class="i">toCsv</span>
 
 <span class="k">let</span> <span class="i">xlsToCsv</span> <span class="i">filePath</span> <span class="o">=</span>

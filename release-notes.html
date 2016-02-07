@@ -32,7 +32,17 @@
       <div class="row">
         <div class="span9" id="main">
           
-<h4><a name="0-0-1-alpha-Febuary-06-2016" class="anchor" href="#0-0-1-alpha-Febuary-06-2016">0.0.1-alpha - Febuary 06 2016</a></h4>
+<h4><a name="0-0-1-beta-February-07-2016" class="anchor" href="#0-0-1-beta-February-07-2016">0.0.1-beta - February 07 2016</a></h4>
+<ul>
+<li>Fix typo in <code>Workbook.fromXlsxBytes</code>.</li>
+<li>Swap parameter order for <code>sheetAt</code> and <code>sheetNamed</code> to allow piping.</li>
+<li>
+Rename <code>rows</code> and <code>cells</code>, appending <code>...WithContent</code> to clarify that empty
+rows or cells will be skipped. This can be a common mistake when trying to
+iterate through a document and getting an unexpected count.
+</li>
+</ul>
+<h4><a name="0-0-1-alpha-February-06-2016" class="anchor" href="#0-0-1-alpha-February-06-2016">0.0.1-alpha - February 06 2016</a></h4>
 <ul>
 <li>Initial release</li>
 </ul>
